@@ -111,21 +111,26 @@
         
     </main>
 
-    <!-- Footer Branding -->
+    <!-- Footer Branding & Social Media -->
     <footer class="max-w-3xl mx-auto px-4 py-8 text-center border-t border-slate-200 mt-8">
         <!-- Tulisan "Powered by" ini jadi sensor Secret Tap-nya -->
-        <p id="poweredByText" class="text-[10px] text-slate-400 mb-2 cursor-pointer select-none">Powered by <b>iMersWAstore</b></p>
+        <p id="poweredByText" class="text-[10px] text-slate-400 mb-4 cursor-pointer select-none">Powered by <b>iMersWAstore</b></p>
+        
+        <!-- Social Media Container -->
+        <div id="footerSocialMedia" class="flex items-center justify-center gap-3">
+            <!-- Diisi dari JS -->
+        </div>
     </footer>
 
     <!-- ========================================== -->
-    <!-- MODAL DETAIL PRODUK -->
+    <!-- MODAL DETAIL PRODUK (DENGAN VARIAN) -->
     <!-- ========================================== -->
     <div id="productDetailModal" class="fixed inset-0 z-[120] hidden">
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" onclick="closeProductDetail()"></div>
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-             <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm text-left overflow-hidden z-10 transform transition-all scale-95 opacity-0 border border-slate-100" id="productDetailContent">
+             <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm text-left overflow-hidden z-10 transform transition-all scale-95 opacity-0 border border-slate-100 flex flex-col max-h-[90vh]" id="productDetailContent">
                 
-                <button onclick="closeProductDetail()" class="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur rounded-full text-slate-600 hover:bg-white z-10 shadow-sm">
+                <button onclick="closeProductDetail()" class="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur rounded-full text-slate-600 hover:bg-white z-20 shadow-sm transition-colors">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
                 
@@ -134,20 +139,35 @@
                     <span id="detailBadgeText" class="bg-red-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-md shadow-md animate-pulse uppercase tracking-wider"></span>
                 </div>
 
-                <div class="aspect-square bg-slate-100 relative">
-                    <img id="detailImg" src="" class="w-full h-full object-cover">
-                </div>
-                
-                <div class="p-5">
-                    <h3 id="detailName" class="text-xl font-bold text-slate-800 mb-1 leading-tight">Nama Produk</h3>
-                    <p id="detailPriceUnit" class="text-emerald-600 font-black text-xl mb-4">Rp 0 <span class="text-sm text-slate-400 font-medium">/pcs</span></p>
-                    
-                    <div class="mb-5">
-                        <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1"><i data-lucide="info" class="w-3 h-3"></i> Deskripsi Produk</p>
-                        <p id="detailDesc" class="text-sm text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100 shadow-inner">Deskripsi produk...</p>
+                <!-- Scrollable Content Area -->
+                <div class="overflow-y-auto flex-1 hide-scrollbar">
+                    <div class="aspect-square bg-slate-100 relative shrink-0">
+                        <img id="detailImg" src="" class="w-full h-full object-cover">
                     </div>
+                    
+                    <div class="p-5">
+                        <h3 id="detailName" class="text-xl font-bold text-slate-800 mb-1 leading-tight">Nama Produk</h3>
+                        <p id="detailPriceUnit" class="text-emerald-600 font-black text-xl mb-4">Rp 0 <span class="text-sm text-slate-400 font-medium">/pcs</span></p>
+                        
+                        <!-- VARIANT SELECTION AREA -->
+                        <div id="variantSelectionArea" class="hidden mb-5 border-t border-slate-100 pt-4">
+                            <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1"><i data-lucide="layers" class="w-3 h-3"></i> Pilih Varian</p>
+                            <div id="variantOptionsContainer" class="flex flex-wrap gap-2">
+                                <!-- Pilihan varian akan dirender di sini -->
+                            </div>
+                            <p id="variantErrorMsg" class="text-xs text-red-500 font-medium mt-2 hidden animate-pulse">Silakan pilih varian terlebih dahulu!</p>
+                        </div>
 
-                    <button id="detailAddBtn" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl flex justify-center items-center gap-2 shadow-lg transition-all active:scale-95">
+                        <div class="mb-5">
+                            <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1 flex items-center gap-1"><i data-lucide="info" class="w-3 h-3"></i> Deskripsi Produk</p>
+                            <p id="detailDesc" class="text-sm text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100 shadow-inner">Deskripsi produk...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sticky Bottom Button -->
+                <div class="p-4 bg-white border-t border-slate-100 shrink-0">
+                    <button id="detailAddBtn" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl flex justify-center items-center gap-2 shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                         <i data-lucide="shopping-cart" class="w-5 h-5"></i> Tambah ke Keranjang
                     </button>
                 </div>
@@ -307,6 +327,11 @@
         let products = [];
         let cart = [];
         
+        // Varian State untuk Modal
+        let activeProductDetails = null; // Menyimpan data produk yang sedang dibuka
+        let selectedVariantId = null; // Menyimpan ID Varian yang diklik pembeli
+        let parsedVariants = []; // Tempat parse JSON varian produk
+
         // Variables untuk Secret Tap Login
         let secretTapCount = 0;
         let secretTapTimer;
@@ -369,6 +394,34 @@
                 const bannerImg = document.getElementById('storeBannerImg');
                 bannerImg.src = storeData.banner_url;
                 bannerEl.classList.remove('hidden');
+            }
+
+            // === RENDER SOCIAL MEDIA DI FOOTER ===
+            const smContainer = document.getElementById('footerSocialMedia');
+            if (storeData.social_media && storeData.social_media !== '[]') {
+                try {
+                    const smList = JSON.parse(storeData.social_media);
+                    smContainer.innerHTML = smList.map(sm => {
+                        let iconName = 'link'; // default
+                        let colorClass = 'text-slate-400 hover:text-emerald-500';
+                        
+                        switch(sm.platform.toLowerCase()) {
+                            case 'instagram': iconName = 'instagram'; colorClass = 'text-slate-400 hover:text-pink-500'; break;
+                            case 'facebook': iconName = 'facebook'; colorClass = 'text-slate-400 hover:text-blue-600'; break;
+                            case 'twitter': iconName = 'twitter'; colorClass = 'text-slate-400 hover:text-sky-500'; break;
+                            case 'tiktok': iconName = 'music-2'; colorClass = 'text-slate-400 hover:text-slate-900'; break;
+                            case 'shopee': iconName = 'shopping-bag'; colorClass = 'text-slate-400 hover:text-orange-500'; break;
+                            case 'tokopedia': iconName = 'shopping-bag'; colorClass = 'text-slate-400 hover:text-green-500'; break;
+                        }
+                        
+                        return `
+                        <a href="${sm.url}" target="_blank" class="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center transition-colors shadow-sm hover:shadow-md ${colorClass}">
+                            <i data-lucide="${iconName}" class="w-5 h-5"></i>
+                        </a>
+                        `;
+                    }).join('');
+                    lucide.createIcons();
+                } catch(e) { console.error("Error parse sosmed", e); }
             }
 
             // Render Info Pembayaran di Modal Checkout
@@ -482,7 +535,7 @@
         });
 
         // ==========================================
-        // RENDER GRID PRODUK (REMOVED: Sisa Stok Hitam)
+        // RENDER GRID PRODUK
         // ==========================================
         function filterProducts() {
             const q = document.getElementById('searchProd').value.toLowerCase();
@@ -507,15 +560,26 @@
             grid.innerHTML = list.map(p => {
                 const imgUrl = p.img || `https://placehold.co/300x300/e2e8f0/64748b?text=${p.name.charAt(0)}`;
                 
-                // Menampilkan Badge Promo/Sale dinamis (Sisa Stok yang lawas sudah dihapus murni)
                 const badgeHtml = p.badge 
                     ? `<div class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-md shadow-md z-10 animate-pulse uppercase tracking-wider">${p.badge}</div>` 
+                    : '';
+
+                // Cek Varian untuk tampilan badge "Tersedia Varian" di foto
+                let hasVariant = false;
+                try {
+                    let vars = JSON.parse(p.variants || '[]');
+                    if(vars.length > 0) hasVariant = true;
+                } catch(e) {}
+
+                const variantBadgeHtml = hasVariant
+                    ? `<div class="absolute bottom-2 left-2 bg-slate-900/70 backdrop-blur text-white text-[9px] font-bold px-2 py-0.5 rounded flex items-center gap-1 shadow-sm"><i data-lucide="layers" class="w-3 h-3"></i> Varian</div>`
                     : '';
 
                 return `
                 <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col group relative cursor-pointer hover:shadow-lg transition-all duration-300" onclick="openProductDetail('${p.id}')">
                     <div class="aspect-square bg-slate-100 overflow-hidden relative">
                         ${badgeHtml}
+                        ${variantBadgeHtml}
                         <img src="${imgUrl}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                     </div>
                     <div class="p-3.5 flex-1 flex flex-col">
@@ -527,7 +591,7 @@
                                 <p class="text-emerald-600 font-black text-base leading-none">${formatRupiah(p.price)}</p>
                                 <p class="text-[9px] text-slate-400 mt-1 font-medium">/${p.unit || 'pcs'}</p>
                             </div>
-                            <button onclick="event.stopPropagation(); addCart('${p.id}')" class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-emerald-500 transition-colors shadow-md transform active:scale-95 shrink-0">
+                            <button onclick="event.stopPropagation(); openProductDetail('${p.id}')" class="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-emerald-500 transition-colors shadow-md transform active:scale-95 shrink-0">
                                 <i data-lucide="plus" class="w-4 h-4"></i>
                             </button>
                         </div>
@@ -540,12 +604,15 @@
         }
 
         // ==========================================
-        // MODAL DETAIL PRODUK
+        // MODAL DETAIL PRODUK (UPDATE VARIAN LOGIC)
         // ==========================================
         function openProductDetail(id) {
             const p = products.find(x => x.id === id);
             if (!p) return;
             
+            activeProductDetails = p; // Simpan ke state global
+            selectedVariantId = null; // Reset varian yang dipilih
+
             const imgUrl = p.img || `https://placehold.co/300x300/e2e8f0/64748b?text=${p.name.charAt(0)}`;
             document.getElementById('detailImg').src = imgUrl;
             document.getElementById('detailName').innerText = p.name;
@@ -561,10 +628,54 @@
                 badgeContainer.classList.add('hidden');
             }
 
+            // === CEK DAN RENDER VARIAN JIKA ADA ===
+            const varArea = document.getElementById('variantSelectionArea');
+            const varContainer = document.getElementById('variantOptionsContainer');
+            const varError = document.getElementById('variantErrorMsg');
+            varError.classList.add('hidden'); // Sembunyikan error awal
+
+            parsedVariants = [];
+            try { 
+                if (p.variants && p.variants !== '') {
+                    parsedVariants = JSON.parse(p.variants); 
+                }
+            } catch(e) {}
+
+            if (parsedVariants.length > 0) {
+                varArea.classList.remove('hidden');
+                varContainer.innerHTML = parsedVariants.map(v => {
+                    // Gabungkan teks Warna dan Size jika ada
+                    let label = [];
+                    if(v.warna) label.push(v.warna);
+                    if(v.size) label.push(v.size);
+                    let labelText = label.join(' - ');
+                    
+                    // Cek apakah varian out of stock
+                    let isOutOfStock = false;
+                    if (v.stok !== '' && !isNaN(parseInt(v.stok)) && parseInt(v.stok) <= 0) {
+                        isOutOfStock = true;
+                    }
+
+                    if(isOutOfStock) {
+                        return `<button type="button" disabled class="px-4 py-2 border border-slate-200 bg-slate-100 text-slate-400 rounded-lg text-sm font-medium cursor-not-allowed line-through opacity-70">${labelText} (Habis)</button>`;
+                    }
+
+                    return `<button type="button" id="btn-var-${v.id}" onclick="selectVariant('${v.id}')" class="variant-btn px-4 py-2 border border-slate-200 bg-white text-slate-700 rounded-lg text-sm font-medium hover:border-emerald-500 hover:text-emerald-600 transition-colors">${labelText}</button>`;
+                }).join('');
+            } else {
+                varArea.classList.add('hidden');
+                varContainer.innerHTML = '';
+            }
+
             // Set tombol tambah ke keranjang
             document.getElementById('detailAddBtn').onclick = function() {
-                addCart(p.id);
-                closeProductDetail();
+                // Jika produk punya varian tapi belum ada yang dipilih, tolak!
+                if (parsedVariants.length > 0 && !selectedVariantId) {
+                    varError.classList.remove('hidden');
+                    return;
+                }
+                
+                addCartWithVariant();
             };
 
             const modal = document.getElementById('productDetailModal');
@@ -575,6 +686,42 @@
                 content.classList.remove('scale-95', 'opacity-0');
                 content.classList.add('scale-100', 'opacity-100');
             }, 10);
+        }
+
+        // FUNGSI SAAT VARIAN DI-KLIK
+        function selectVariant(varId) {
+            selectedVariantId = varId;
+            document.getElementById('variantErrorMsg').classList.add('hidden'); // Hilangkan pesan error
+            
+            // Ubah gaya tombol varian (Bikin Active)
+            document.querySelectorAll('.variant-btn').forEach(btn => {
+                btn.classList.remove('bg-emerald-50', 'border-emerald-500', 'text-emerald-600', 'ring-2', 'ring-emerald-200');
+                btn.classList.add('bg-white', 'border-slate-200', 'text-slate-700');
+            });
+            const activeBtn = document.getElementById('btn-var-' + varId);
+            if(activeBtn) {
+                activeBtn.classList.remove('bg-white', 'border-slate-200', 'text-slate-700');
+                activeBtn.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-600', 'ring-2', 'ring-emerald-200');
+            }
+
+            // Ubah Harga dan Gambar secara dinamis sesuai varian
+            const varianData = parsedVariants.find(v => v.id === varId);
+            if(varianData) {
+                // Harga
+                if(varianData.harga && varianData.harga !== '') {
+                    document.getElementById('detailPriceUnit').innerHTML = `${formatRupiah(varianData.harga)} <span class="text-sm text-slate-400 font-medium">/${activeProductDetails.unit || 'pcs'}</span>`;
+                } else {
+                    document.getElementById('detailPriceUnit').innerHTML = `${formatRupiah(activeProductDetails.price)} <span class="text-sm text-slate-400 font-medium">/${activeProductDetails.unit || 'pcs'}</span>`;
+                }
+
+                // Gambar
+                const imgEl = document.getElementById('detailImg');
+                if(varianData.gambar && varianData.gambar !== '') {
+                    imgEl.src = varianData.gambar;
+                } else {
+                    imgEl.src = activeProductDetails.img || `https://placehold.co/300x300/e2e8f0/64748b?text=${activeProductDetails.name.charAt(0)}`;
+                }
+            }
         }
 
         function closeProductDetail() {
@@ -589,24 +736,95 @@
         }
 
         // ==========================================
-        // CART LOGIC (KERANJANG BELANJA)
+        // CART LOGIC (KERANJANG BELANJA TERUPDATE)
         // ==========================================
-        function addCart(id) {
-            const product = products.find(p => p.id === id);
-            
-            if (!product) {
-                return;
-            }
+        function addCartWithVariant() {
+            let prodToAdd = { ...activeProductDetails }; // Copy data asli
 
-            const exist = cart.find(c => c.id === id);
-            
-            if (exist) {
-                if (exist.qty >= product.stock) {
-                    return alert("Maksimal stok tercapai!");
+            // Jika ada varian yang dipilih, kita "manipulasi" data produknya sedikit
+            if (selectedVariantId && parsedVariants.length > 0) {
+                const varData = parsedVariants.find(v => v.id === selectedVariantId);
+                if (varData) {
+                    // Gabungkan nama produk dengan nama varian (agar di nota WA jelas)
+                    let labelArr = [];
+                    if(varData.warna) labelArr.push(varData.warna);
+                    if(varData.size) labelArr.push(varData.size);
+                    
+                    prodToAdd.name = `${prodToAdd.name} - ${labelArr.join(' ')}`;
+                    
+                    // Timpa harga kalau varian punya harga khusus
+                    if (varData.harga && varData.harga !== '') {
+                        prodToAdd.price = parseInt(varData.harga);
+                    }
+                    
+                    // Timpa gambar kalau ada
+                    if (varData.gambar && varData.gambar !== '') {
+                        prodToAdd.img = varData.gambar;
+                    }
+
+                    // Timpa stok dan simpan id varian (buat backend nanti kurangin stok spesifik)
+                    prodToAdd.stock = varData.stok; // bisa '' (unlimited) atau angka
+                    prodToAdd.variant_id = selectedVariantId;
+                    
+                    // Ganti ID sementara di keranjang supaya kalau dia milih 2 varian beda dari produk yg sama, nggak ketumpuk
+                    prodToAdd.cart_id = `${prodToAdd.id}-${selectedVariantId}`; 
                 }
-                exist.qty++;
             } else {
-                cart.push({ ...product, qty: 1 });
+                prodToAdd.cart_id = prodToAdd.id; // Untuk produk polos tanpa varian
+            }
+            
+            const existing = cart.find(c => c.cart_id === prodToAdd.cart_id);
+            
+            if (existing) {
+                // Cek Max Stock saat nambah qty
+                if (existing.stock !== '' && !isNaN(parseInt(existing.stock))) {
+                    if (existing.qty >= parseInt(existing.stock)) {
+                        return alert("Maksimal stok tercapai!");
+                    }
+                }
+                existing.qty++;
+            } else {
+                cart.push({ ...prodToAdd, qty: 1 });
+            }
+            
+            updateCartUI();
+            closeProductDetail();
+            
+            // Animasi Bounce Button Cart Icon di Header
+            const badge = document.getElementById('cartBadge');
+            badge.classList.add('animate-bounce');
+            setTimeout(() => {
+                badge.classList.remove('animate-bounce');
+            }, 1000);
+        }
+
+        // --- Logika Cart Lama yang Disamakan (Dipakai untuk tombol + di grid katalog) ---
+        function addCart(id) {
+            // Untuk produk tanpa varian aja (tombol cepat dari grid)
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+
+            // Jika produk ini ternyata PUNYA varian, paksa buka modal!
+            try {
+                let vars = JSON.parse(product.variants || '[]');
+                if(vars.length > 0) {
+                    return openProductDetail(id);
+                }
+            } catch(e) {}
+
+            // Lanjut masuk keranjang jika tanpa varian
+            const cartId = id;
+            const existing = cart.find(c => c.cart_id === cartId);
+            
+            if (existing) {
+                if (existing.stock !== '' && !isNaN(parseInt(existing.stock))) {
+                    if (existing.qty >= parseInt(existing.stock)) {
+                        return alert("Maksimal stok tercapai!");
+                    }
+                }
+                existing.qty++;
+            } else {
+                cart.push({ ...product, cart_id: cartId, qty: 1 });
             }
             
             updateCartUI();
@@ -619,12 +837,9 @@
             }, 1000);
         }
 
-        function updateCartQty(id, delta) {
-            const idx = cart.findIndex(c => c.id === id);
-            
-            if (idx === -1) {
-                return;
-            }
+        function updateCartQty(cartId, delta) {
+            const idx = cart.findIndex(c => c.cart_id === cartId);
+            if (idx === -1) return;
             
             const item = cart[idx];
             item.qty += delta;
@@ -633,10 +848,11 @@
                 cart.splice(idx, 1);
             } else {
                 // Cek Max Stock saat ditambah
-                const masterProd = products.find(p => p.id === id);
-                if (item.qty > masterProd.stock) {
-                    item.qty = masterProd.stock;
-                    alert("Maksimal stok!");
+                if (item.stock !== '' && !isNaN(parseInt(item.stock))) {
+                    if (item.qty > parseInt(item.stock)) {
+                        item.qty = parseInt(item.stock);
+                        alert("Maksimal stok yang tersedia tercapai!");
+                    }
                 }
             }
             
@@ -690,13 +906,13 @@
                 <div class="bg-white p-3 rounded-xl border border-slate-100 shadow-sm flex items-center gap-3 hover:shadow-md transition-shadow">
                     <img src="${c.img || 'https://placehold.co/100'}" class="w-14 h-14 rounded-lg object-cover bg-slate-100">
                     <div class="flex-1 min-w-0">
-                        <h4 class="font-bold text-slate-800 text-sm truncate">${c.name}</h4>
+                        <h4 class="font-bold text-slate-800 text-sm truncate" title="${c.name}">${c.name}</h4>
                         <p class="text-emerald-600 font-bold text-xs mt-0.5">${formatRupiah(c.price)}</p>
                     </div>
                     <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-lg p-1 shrink-0 shadow-inner">
-                        <button onclick="updateCartQty('${c.id}', -1)" class="w-6 h-6 flex items-center justify-center bg-white rounded text-slate-600 shadow-sm hover:text-emerald-600"><i data-lucide="minus" class="w-3 h-3"></i></button>
+                        <button onclick="updateCartQty('${c.cart_id}', -1)" class="w-6 h-6 flex items-center justify-center bg-white rounded text-slate-600 shadow-sm hover:text-emerald-600"><i data-lucide="minus" class="w-3 h-3"></i></button>
                         <span class="text-xs font-bold w-4 text-center">${c.qty}</span>
-                        <button onclick="updateCartQty('${c.id}', 1)" class="w-6 h-6 flex items-center justify-center bg-white rounded text-slate-600 shadow-sm hover:text-emerald-600"><i data-lucide="plus" class="w-3 h-3"></i></button>
+                        <button onclick="updateCartQty('${c.cart_id}', 1)" class="w-6 h-6 flex items-center justify-center bg-white rounded text-slate-600 shadow-sm hover:text-emerald-600"><i data-lucide="plus" class="w-3 h-3"></i></button>
                     </div>
                 </div>
                 `).join('');
@@ -778,10 +994,18 @@
                 total += (c.price * c.qty);
                 const sub = c.price * c.qty;
                 waItemsText += `🔹 ${c.name} (${c.qty} ${c.unit || 'pcs'}) = ${formatRupiah(sub)}\n`;
-                apiItemsArr.push(`${c.name} (${c.qty}${c.unit || 'pcs'})`);
+                
+                // Masukkan variant_id kalau ada, biar backend bisa tracking stok varian
+                apiItemsArr.push({
+                    id: c.id, 
+                    variant_id: c.variant_id || null, 
+                    name: c.name, 
+                    qty: c.qty, 
+                    unit: c.unit || 'pcs'
+                });
             });
 
-            // 1. Simpan ke database Backend (Sheet Orders)
+            // 1. Simpan ke database Backend (Sheet Orders & Potong Stok)
             try {
                 let fd = new FormData();
                 fd.append('action', 'add_order');
@@ -789,7 +1013,14 @@
                 fd.append('nama_pembeli', buyer);
                 fd.append('total_belanja', total);
                 fd.append('status', 'Baru'); // Status pesanan online baru
-                fd.append('detail_items', JSON.stringify(apiItemsArr));
+                
+                // Gunakan format raw string array untuk items agar kompatibel dengan sistem lama
+                let simpleStrArr = apiItemsArr.map(item => `${item.name} (${item.qty}${item.unit})`);
+                fd.append('detail_items', JSON.stringify(simpleStrArr));
+                
+                // Gunakan payload khusus JSON baru untuk proses potong stok varian yang canggih di Backend
+                fd.append('detail_items_raw', JSON.stringify(apiItemsArr)); 
+
                 fd.append('metode_pembayaran', method);
                 fd.append('uang_bayar', total); // Anggap dibayar pas untuk pesanan online
                 fd.append('kembalian', 0);
@@ -834,6 +1065,9 @@
                 updateCartUI();
                 toggleCart();
                 alert("Pesanan berhasil dibuat! Anda akan diarahkan ke WhatsApp.");
+                
+                // Refresh data katalog diam-diam biar stok terbaru langsung nge-sync
+                fetchStoreCatalog();
 
             } catch (err) {
                 console.error("Error order:", err);
